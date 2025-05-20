@@ -5,16 +5,17 @@
     <title>My GitHub Pages Video</title>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        const correctPassphrase = "comrades"; 
+        // 🔐 Passphrase Protection
+        const correctPassphrase = "comrades"; // Set your passphrase here
         const userInput = prompt("Enter passphrase to access this page:");
 
         if (userInput !== correctPassphrase) {
           alert("Incorrect passphrase. Redirecting...");
-          window.location.href = "https://google.com"; 
+          window.location.href = "https://google.com";
           return;
         }
 
-        // Continue with page setup
+        // 🎥 Video Play Detection
         const video = document.getElementById('myVideo');
         let hasPlayed = false;
 
@@ -25,15 +26,35 @@
           }
         });
 
+        // 🌐 Notify via IFTTT including IP, location, and device info
         function notifyPlayEvent() {
-          fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              value1: "Video was played!",
-              time: new Date().toISOString()
+          const userAgent = navigator.userAgent;
+
+          fetch("https://ipapi.co/json/")
+            .then(response => response.json())
+            .then(data => {
+              const ip = data.ip || "Unknown";
+              const city = data.city || "Unknown";
+              const region = data.region || "Unknown";
+              const country = data.country || "Unknown";
+
+              const message = `Video played!
+IP: ${ip}
+Location: ${city}, ${region}, ${country}
+Device: ${userAgent}`;
+
+              fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  value1: message,
+                  time: new Date().toISOString()
+                })
+              });
             })
-          });
+            .catch(error => {
+              console.error("Failed to fetch IP info:", error);
+            });
         }
       });
     </script>
@@ -42,7 +63,7 @@
     <h1>Hello World</h1>
     <p>I'm hosted with GitHub Pages.</p>
 
-    <!-- Video section -->
+    <!-- Video -->
     <video id="myVideo" width="640" controls>
       <source src="assets/video.mp4" type="video/mp4">
       Your browser does not support the video tag.
