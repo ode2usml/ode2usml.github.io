@@ -3,20 +3,18 @@
   <head>
     <meta charset="UTF-8">
     <title>My GitHub Pages Video</title>
-  </head>
-  <body>
-    <h1>Hello World</h1>
-    <p>I'm hosted with GitHub Pages.</p>
-
-    <!-- Video section -->
-    <video id="myVideo" width="640" controls>
-      <source src="assets/video.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-
-    <!-- Tracking script -->
     <script>
       document.addEventListener('DOMContentLoaded', function () {
+        const correctPassphrase = "comrades"; 
+        const userInput = prompt("Enter passphrase to access this page:");
+
+        if (userInput !== correctPassphrase) {
+          alert("Incorrect passphrase. Redirecting...");
+          window.location.href = "https://google.com"; 
+          return;
+        }
+
+        // Continue with page setup
         const video = document.getElementById('myVideo');
         let hasPlayed = false;
 
@@ -39,5 +37,15 @@
         }
       });
     </script>
+  </head>
+  <body>
+    <h1>Hello World</h1>
+    <p>I'm hosted with GitHub Pages.</p>
+
+    <!-- Video section -->
+    <video id="myVideo" width="640" controls>
+      <source src="assets/video.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
   </body>
 </html>
