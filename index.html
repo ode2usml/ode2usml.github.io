@@ -26,34 +26,20 @@
           }
         });
 
-        // 🌐 Notify via IFTTT including IP, location, and device info
+        // 💻 Notify with device info only
         function notifyPlayEvent() {
           const userAgent = navigator.userAgent;
 
-          fetch("https://ipapi.co/json/")
-            .then(response => response.json())
-            .then(data => {
-              const ip = data.ip || "Unknown";
-              const city = data.city || "Unknown";
-              const region = data.region || "Unknown";
-              const country = data.country || "Unknown";
+          const message = `🎬 Video played!
+Device Info: ${userAgent}`;
 
-              const message = `🎬 Video played!
-IP: ${ip}
-Location: ${city}, ${region}, ${country}
-Device: ${userAgent}`;
+          console.log("Sending to IFTTT:\n", message); // Debugging
 
-              console.log("Sending to IFTTT:\n", message); // 🔍 Debug output
-
-              fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ value1: message })
-              });
-            })
-            .catch(error => {
-              console.error("Failed to fetch IP info:", error);
-            });
+          fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ value1: message })
+          });
         }
       });
     </script>
