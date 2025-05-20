@@ -1,8 +1,43 @@
 <!DOCTYPE html>
 <html>
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
-</body>
-</html>
+  <head>
+    <meta charset="UTF-8">
+    <title>My GitHub Pages Video</title>
+  </head>
+  <body>
+    <h1>Hello World</h1>
+    <p>I'm hosted with GitHub Pages.</p>
 
+    <!-- Video section -->
+    <video id="myVideo" width="640" controls>
+      <source src="assets/video.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <!-- Tracking script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const video = document.getElementById('myVideo');
+        let hasPlayed = false;
+
+        video.addEventListener('play', function () {
+          if (!hasPlayed) {
+            hasPlayed = true;
+            notifyPlayEvent();
+          }
+        });
+
+        function notifyPlayEvent() {
+          fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              value1: "Video was played!",
+              time: new Date().toISOString()
+            })
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
