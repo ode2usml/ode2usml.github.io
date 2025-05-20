@@ -6,7 +6,7 @@
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         // 🔐 Passphrase Protection
-        const correctPassphrase = "yourSecret123"; // Set your passphrase
+        const correctPassphrase = "yourSecret123"; // Change this!
         const userInput = prompt("Enter passphrase to access this page:");
 
         if (userInput !== correctPassphrase) {
@@ -26,20 +26,29 @@
           }
         });
 
-        // 💻 Notify with device info only
+        // 💻 Send Device Info to IFTTT (CORS-safe version)
         function notifyPlayEvent() {
           const userAgent = navigator.userAgent;
+          const message = `🎬 Video played!\nDevice Info: ${userAgent}`;
+          const payload = {
+            value1: message,
+            value2: "",
+            value3: ""
+          };
 
-          const message = `🎬 Video played!
-Device Info: ${userAgent}`;
+          console.log("Sending to IFTTT:\n", message); // Optional: debug
 
-          console.log("Sending to IFTTT:\n", message); // Debugging
-
-          fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ value1: message })
-          });
+          // Fire-and-forget POST to IFTTT (ignore CORS error silently)
+          try {
+            fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+          } catch (e) {
+            // Silently fail if CORS blocks response
+            console.warn("Silent IFTTT error (likely CORS):", e);
+          }
         }
       });
     </script>
