@@ -6,7 +6,7 @@
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         // 🔐 Passphrase Protection
-        const correctPassphrase = "comrades"; // Set your passphrase here
+        const correctPassphrase = "yourSecret123"; // Set your passphrase
         const userInput = prompt("Enter passphrase to access this page:");
 
         if (userInput !== correctPassphrase) {
@@ -38,18 +38,17 @@
               const region = data.region || "Unknown";
               const country = data.country || "Unknown";
 
-              const message = `Video played!
+              const message = `🎬 Video played!
 IP: ${ip}
 Location: ${city}, ${region}, ${country}
 Device: ${userAgent}`;
 
+              console.log("Sending to IFTTT:\n", message); // 🔍 Debug output
+
               fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  value1: message,
-                  time: new Date().toISOString()
-                })
+                body: JSON.stringify({ value1: message })
               });
             })
             .catch(error => {
