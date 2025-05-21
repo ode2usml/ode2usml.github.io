@@ -1,54 +1,43 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>My GitHub Pages Video</title>
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener("DOMContentLoaded", function () {
         // 🔐 Passphrase Protection
         const correctPassphrase = "yourSecret123"; // Change this!
         const userInput = prompt("Enter passphrase to access this page:");
-
         if (userInput !== correctPassphrase) {
           alert("Incorrect passphrase. Redirecting...");
           window.location.href = "https://google.com";
           return;
         }
 
-        // 🎥 Video Play Detection
-        const video = document.getElementById('myVideo');
-        let hasPlayed = false;
+        // 🎥 Video Timestamp Trigger (30 seconds)
+        const video = document.getElementById("myVideo");
+        let hasNotified = false;
+        const triggerTime = 30; // seconds
 
-        video.addEventListener('play', function () {
-          if (!hasPlayed) {
-            hasPlayed = true;
+        video.addEventListener("timeupdate", function () {
+          if (!hasNotified && video.currentTime >= triggerTime) {
+            hasNotified = true;
             notifyPlayEvent();
           }
         });
 
-        // 💻 Send Device Info to IFTTT (CORS-safe version)
+        // 📬 Notify with Device Info via IFTTT
         function notifyPlayEvent() {
           const userAgent = navigator.userAgent;
-          const message = `🎬 Video played!\nDevice Info: ${userAgent}`;
-          const payload = {
-            value1: message,
-            value2: "",
-            value3: ""
-          };
+          const message = `🎬 Video watched past 30 seconds!\nDevice Info: ${userAgent}`;
 
-          console.log("Sending to IFTTT:\n", message); // Optional: debug
+          console.log("Sending to IFTTT:\n", message); // For debugging
 
-          // Fire-and-forget POST to IFTTT (ignore CORS error silently)
-          try {
-            fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            });
-          } catch (e) {
-            // Silently fail if CORS blocks response
-            console.warn("Silent IFTTT error (likely CORS):", e);
-          }
+          fetch("https://maker.ifttt.com/trigger/video_played/with/key/d2_s_jC9bzjrP4p9VKPeQ0", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ value1: message })
+          });
         }
       });
     </script>
@@ -59,7 +48,7 @@
 
     <!-- Video -->
     <video id="myVideo" width="640" controls>
-      <source src="assets/video.mp4" type="video/mp4">
+      <source src="assets/video.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
   </body>
