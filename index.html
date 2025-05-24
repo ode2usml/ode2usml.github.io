@@ -3,33 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <title>Video Alert Page</title>
+    <style>
+      body {
+        margin: 0;
+        background-color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+    </style>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // 🔐 Passphrase
-        const correctPassphrase = "yourSecret123"; // Change this
-        const userInput = prompt("Enter passphrase to access this page:");
+        const correctPassphrase = "comrades";
+        const userInput = prompt("password is the pub we met at, watch this in a quiet place on your own:");
         if (userInput !== correctPassphrase) {
           alert("Incorrect passphrase. Redirecting...");
           window.location.href = "https://google.com";
           return;
         }
 
-        // 🎥 Video play trigger at 30s
         const video = document.getElementById("myVideo");
-        let hasNotified = false;
-        const triggerTime = 30; // seconds
-
-        video.addEventListener("timeupdate", function () {
-          if (!hasNotified && video.currentTime >= triggerTime) {
-            hasNotified = true;
-            notifyTelegram();
+        let notifiedStart = false;
+        let notifiedMid = false;
+        const triggerTime = 490;
+        video.addEventListener("play", function () {
+          if (!notifiedStart) {
+            notifiedStart = true;
+            notifyTelegram("▶️ Video started!");
           }
         });
 
-        // 📲 Telegram Notification
-        function notifyTelegram() {
+        video.addEventListener("timeupdate", function () {
+          if (!notifiedMid && video.currentTime >= triggerTime) {
+            notifiedMid = true;
+            notifyTelegram("⏱ Reached 8:10 mark!");
+          }
+        });
+
+        function notifyTelegram(eventMessage) {
           const userAgent = navigator.userAgent;
-          const message = `🎬 Video watched past 30 seconds!\n📱 Device: ${userAgent}`;
+          const message = `${eventMessage}\n📱 Device: ${userAgent}`;
           const token = "7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ";
           const chatId = "7916898396";
 
@@ -46,10 +60,6 @@
     </script>
   </head>
   <body>
-    <h1>Hello World</h1>
-    <p>I'm hosted with GitHub Pages.</p>
-
-    <!-- Video -->
     <video id="myVideo" width="640" controls>
       <source src="assets/video.mp4" type="video/mp4" />
       Your browser does not support the video tag.
