@@ -6,21 +6,22 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
-      --bg: #0f172a;
-      --text: #e2e8f0;
       --accent: #3b82f6;
       --nav-bg: #1e293b;
-      --card-bg: #1e1e2f;
+      --card-bg: rgba(20,20,40,0.8);
+      --text: #e2e8f0;
     }
-
     body {
       margin: 0;
       font-family: sans-serif;
       display: none;
-      background: var(--bg);
+      background-color: #000022;
+      background-image: url('https://tse4.mm.bing.net/th/id/OIP.Pv7B47gXXk9msW2G3XwtwAHaHa?pid=Api');
+      background-repeat: repeat;
+      background-size: auto;
       color: var(--text);
+      display: flex;
     }
-
     nav {
       width: 200px;
       background: var(--nav-bg);
@@ -29,7 +30,6 @@
       padding: 1rem;
       box-sizing: border-box;
     }
-
     nav button {
       background: var(--accent);
       color: white;
@@ -40,68 +40,51 @@
       cursor: pointer;
       border-radius: 5px;
     }
-
     main {
       flex: 1;
       padding: 2rem;
       overflow-y: auto;
     }
-
     .post {
       background: var(--card-bg);
       margin-bottom: 2rem;
       padding: 1rem;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
     }
-
     .post h2 {
       margin-bottom: 0.3em;
       color: var(--text);
     }
-
     .timestamp {
       font-size: 0.8em;
       color: #94a3b8;
       margin-bottom: 0.8em;
     }
-
-    #videoModal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.9);
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    #videoModal video {
-      max-width: 90%;
-      max-height: 80vh;
-    }
-
-    #videoModal button {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: red;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-    }
-
     img {
       max-width: 100%;
       border-radius: 4px;
       margin-top: 1rem;
     }
-
-    html, body {
-      display: flex;
+    #videoModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #videoModal video { max-width: 90%; max-height: 80vh; }
+    #videoModal button {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: red;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -112,15 +95,12 @@
   <main>
     <div id="posts">Loading...</div>
   </main>
-
   <div id="videoModal">
     <button onclick="closeVideo()">Close</button>
     <video id="myVideo" controls>
       <source src="assets/video.mp4" type="video/mp4">
-      Your browser does not support the video tag.
     </video>
   </div>
-
   <script>
     const correctPass = "comrades";
     const entered = prompt("you already know it");
@@ -129,90 +109,52 @@
       location.href = "https://google.com";
     } else {
       document.body.style.display = "flex";
-      notifyAccess(); // Notify when accessed
+      notifyAccess();
     }
 
     const repo = "ode2usml/ode2usml.github.io";
     const api = `https://api.github.com/repos/${repo}/issues`;
-
-    fetch(api)
-      .then(res => res.json())
-      .then(issues => {
-        const container = document.getElementById("posts");
-        container.innerHTML = "";
-        issues.forEach(issue => {
-          const post = document.createElement("div");
-          post.className = "post";
-          post.innerHTML = `
-            <h2>${issue.title}</h2>
-            <div class="timestamp">${new Date(issue.created_at).toLocaleString()}</div>
-            <div>${marked.parse(issue.body)}</div>
-          `;
-          container.appendChild(post);
-        });
-      })
-      .catch(err => {
-        document.getElementById("posts").innerHTML = "Failed to load posts.";
-        console.error(err);
+    fetch(api).then(r=>r.json()).then(issues=>{
+      const c = document.getElementById("posts");
+      c.innerHTML = "";
+      issues.forEach(issue => {
+        const d = document.createElement("div");
+        d.className = "post";
+        d.innerHTML = `<h2>${issue.title}</h2>
+          <div class="timestamp">${new Date(issue.created_at).toLocaleString()}</div>
+          <div>${marked.parse(issue.body)}</div>`;
+        c.appendChild(d);
       });
+    }).catch(err=>{console.error(err);document.getElementById("posts").textContent="Failed to load."});
 
-    function showVideoPrompt() {
-      const userInput = prompt("you already know it");
-      if (userInput !== "comrades") {
-        alert("Incorrect passphrase. Redirecting...");
-        window.location.href = "https://google.com";
+    function showVideoPrompt(){
+      if(prompt("you already know it")!==correctPass){
+        alert("Redirecting..."); location.href="https://google.com";
         return;
       }
-
-      const videoModal = document.getElementById("videoModal");
-      const video = document.getElementById("myVideo");
-      videoModal.style.display = "flex";
-      video.play();
-
-      let notifiedStart = false;
-      let notifiedMid = false;
-      const triggerTime = 490;
-
-      video.addEventListener("play", function () {
-        if (!notifiedStart) {
-          notifiedStart = true;
-          notifyTelegram("▶️ Video started!");
-        }
-      });
-
-      video.addEventListener("timeupdate", function () {
-        if (!notifiedMid && video.currentTime >= triggerTime) {
-          notifiedMid = true;
-          notifyTelegram("⏱ Reached 8:10 mark!");
-        }
-      });
+      const vM = document.getElementById("videoModal");
+      const v = document.getElementById("myVideo");
+      vM.style.display="flex"; v.play();
+      let s=false,m=false;
+      v.addEventListener("play", ()=>{ if(!s){s=true;notifyTelegram("▶️ Video started!");}});
+      v.addEventListener("timeupdate", ()=>{ if(!m&&v.currentTime>=490){m=true;notifyTelegram("⏱ Reached 8:10 mark!");}});
     }
 
-    function notifyAccess() {
-      const userAgent = navigator.userAgent;
-      const time = new Date().toLocaleString();
-      const message = `🌐 Site accessed at ${time}\\n📱 Device: ${userAgent}`;
-      notifyTelegram(message);
+    function notifyAccess(){
+      notifyTelegram(`🌐 Site accessed at ${new Date().toLocaleString()}\n📱 ${navigator.userAgent}`);
     }
-
-    function notifyTelegram(message) {
-      const token = "7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ"; // Replace for testing only
-      const chatId = "7916898396";
-
-      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text: message })
+    function notifyTelegram(message){
+      fetch(`https://api.telegram.org/bot7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ/sendMessage`, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({chat_id:"7916898396",text:message})
       });
     }
-
-    function closeVideo() {
-      const videoModal = document.getElementById("videoModal");
-      const video = document.getElementById("myVideo");
-      video.pause();
-      video.currentTime = 0;
-      videoModal.style.display = "none";
+    function closeVideo(){
+      const vm=document.getElementById("videoModal"),v=document.getElementById("myVideo");
+      v.pause();v.currentTime=0;vm.style.display="none";
     }
   </script>
 </body>
 </html>
+``			
