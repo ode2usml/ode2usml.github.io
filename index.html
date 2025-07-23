@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title></title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
       --bg: #0f172a;
@@ -27,11 +28,6 @@
       height: 100vh;
       padding: 1rem;
       box-sizing: border-box;
-    }
-
-    nav h2 {
-      margin-top: 0;
-      font-size: 1.2rem;
     }
 
     nav button {
@@ -97,11 +93,20 @@
       padding: 0.5rem 1rem;
       cursor: pointer;
     }
+
+    img {
+      max-width: 100%;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+
+    html, body {
+      display: flex;
+    }
   </style>
 </head>
 <body>
   <nav>
-    <h2>Menu</h2>
     <button onclick="showVideoPrompt()">An ode to us</button>
   </nav>
   <main>
@@ -117,7 +122,6 @@
   </div>
 
   <script>
-    // Website Access Prompt
     const correctPass = "comrades";
     const entered = prompt("you already know it");
     if (entered !== correctPass) {
@@ -125,6 +129,7 @@
       location.href = "https://google.com";
     } else {
       document.body.style.display = "flex";
+      notifyAccess(); // Notify when accessed
     }
 
     const repo = "ode2usml/ode2usml.github.io";
@@ -141,7 +146,7 @@
           post.innerHTML = `
             <h2>${issue.title}</h2>
             <div class="timestamp">${new Date(issue.created_at).toLocaleString()}</div>
-            <p>${issue.body.replace(/\\n/g, '<br>')}</p>
+            <div>${marked.parse(issue.body)}</div>
           `;
           container.appendChild(post);
         });
@@ -152,13 +157,13 @@
       });
 
     function showVideoPrompt() {
-      const correctPassphrase = "comrades";
       const userInput = prompt("you already know it");
-      if (userInput !== correctPassphrase) {
+      if (userInput !== "comrades") {
         alert("Incorrect passphrase. Redirecting...");
         window.location.href = "https://google.com";
         return;
       }
+
       const videoModal = document.getElementById("videoModal");
       const video = document.getElementById("myVideo");
       videoModal.style.display = "flex";
@@ -181,19 +186,24 @@
           notifyTelegram("⏱ Reached 8:10 mark!");
         }
       });
+    }
 
-      function notifyTelegram(eventMessage) {
-        const userAgent = navigator.userAgent;
-        const message = `${eventMessage}\\n📱 Device: ${userAgent}`;
-        const token = "7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ";
-        const chatId = "7916898396";
+    function notifyAccess() {
+      const userAgent = navigator.userAgent;
+      const time = new Date().toLocaleString();
+      const message = `🌐 Site accessed at ${time}\\n📱 Device: ${userAgent}`;
+      notifyTelegram(message);
+    }
 
-        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: chatId, text: message })
-        });
-      }
+    function notifyTelegram(message) {
+      const token = "7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ"; // Replace for testing only
+      const chatId = "7916898396";
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text: message })
+      });
     }
 
     function closeVideo() {
