@@ -1,68 +1,67 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Video Alert Page</title>
-    <style>
-      body {
-        margin: 0;
-        background-color: black;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-    </style>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const correctPassphrase = "comrades";
-        const userInput = prompt("password is the pub we met at, watch this in a quiet place on your own:");
-        if (userInput !== correctPassphrase) {
-          alert("Incorrect passphrase. Redirecting...");
-          window.location.href = "https://google.com";
-          return;
-        }
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Blog – Powered by GitHub Issues</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: auto;
+      padding: 2rem;
+      background: #f8fafc;
+    }
+    h1 {
+      text-align: center;
+      color: #1e40af;
+    }
+    .post {
+      background: white;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .post h2 {
+      margin-bottom: 0.3em;
+      color: #0f172a;
+    }
+    .timestamp {
+      font-size: 0.8em;
+      color: #64748b;
+      margin-bottom: 0.8em;
+    }
+  </style>
+</head>
+<body>
+  <h1>My Blog</h1>
+  <div id="posts">Loading...</div>
 
-        const video = document.getElementById("myVideo");
-        let notifiedStart = false;
-        let notifiedMid = false;
-        const triggerTime = 490;
-        video.addEventListener("play", function () {
-          if (!notifiedStart) {
-            notifiedStart = true;
-            notifyTelegram("▶️ Video started!");
-          }
+  <script>
+    const repo = "ode2usml/ode2usml.github.io"; // Replace if needed
+    const api = `https://api.github.com/repos/${repo}/issues`;
+
+    fetch(api)
+      .then(res => res.json())
+      .then(issues => {
+        const container = document.getElementById("posts");
+        container.innerHTML = "";
+        issues.forEach(issue => {
+          const post = document.createElement("div");
+          post.className = "post";
+          post.innerHTML = `
+            <h2>${issue.title}</h2>
+            <div class="timestamp">${new Date(issue.created_at).toLocaleString()}</div>
+            <p>${issue.body.replace(/\\n/g, '<br>')}</p>
+          `;
+          container.appendChild(post);
         });
-
-        video.addEventListener("timeupdate", function () {
-          if (!notifiedMid && video.currentTime >= triggerTime) {
-            notifiedMid = true;
-            notifyTelegram("⏱ Reached 8:10 mark!");
-          }
-        });
-
-        function notifyTelegram(eventMessage) {
-          const userAgent = navigator.userAgent;
-          const message = `${eventMessage}\n📱 Device: ${userAgent}`;
-          const token = "7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ";
-          const chatId = "7916898396";
-
-          fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              chat_id: chatId,
-              text: message
-            })
-          });
-        }
+      })
+      .catch(err => {
+        document.getElementById("posts").innerHTML = "Failed to load posts.";
+        console.error(err);
       });
-    </script>
-  </head>
-  <body>
-    <video id="myVideo" width="640" controls>
-      <source src="assets/video.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-  </body>
+  </script>
+</body>
 </html>
