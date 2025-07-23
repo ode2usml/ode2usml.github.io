@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Blog – Powered by GitHub Issues</title>
+  <meta charset="UTF-8">
+  <title>My Blog with Video Access</title>
   <style>
     body {
+      margin: 0;
       font-family: sans-serif;
-      max-width: 700px;
-      margin: auto;
+      display: none;
+    }
+    nav {
+      width: 200px;
+      background: #1e293b;
+      color: white;
+      height: 100vh;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+    nav h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+    nav button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      width: 100%;
+      margin-top: 1rem;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    main {
+      flex: 1;
       padding: 2rem;
       background: #f8fafc;
-    }
-    h1 {
-      text-align: center;
-      color: #1e40af;
+      overflow-y: auto;
     }
     .post {
       background: white;
@@ -32,14 +53,63 @@
       color: #64748b;
       margin-bottom: 0.8em;
     }
+    #videoModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #videoModal video {
+      max-width: 90%;
+      max-height: 80vh;
+    }
+    #videoModal button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: red;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>My Blog</h1>
-  <div id="posts">Loading...</div>
+  <nav>
+    <h2>Menu</h2>
+    <button onclick="showVideoPrompt()">Watch Video</button>
+  </nav>
+  <main>
+    <h1>My Blog</h1>
+    <div id="posts">Loading...</div>
+  </main>
+
+  <div id="videoModal">
+    <button onclick="closeVideo()">Close</button>
+    <video id="myVideo" controls>
+      <source src="assets/video.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
 
   <script>
-    const repo = "ode2usml/ode2usml.github.io"; // Replace if needed
+    // Website Access Prompt
+    const correctPass = "comrades";
+    const entered = prompt("Enter site password:");
+    if (entered !== correctPass) {
+      alert("Incorrect password. Redirecting...");
+      location.href = "https://google.com";
+    } else {
+      document.body.style.display = "flex";
+    }
+
+    const repo = "ode2usml/ode2usml.github.io";
     const api = `https://api.github.com/repos/${repo}/issues`;
 
     fetch(api)
@@ -53,7 +123,7 @@
           post.innerHTML = `
             <h2>${issue.title}</h2>
             <div class="timestamp">${new Date(issue.created_at).toLocaleString()}</div>
-            <p>${issue.body.replace(/\\n/g, '<br>')}</p>
+            <p>${issue.body.replace(/\n/g, '<br>')}</p>
           `;
           container.appendChild(post);
         });
@@ -62,6 +132,59 @@
         document.getElementById("posts").innerHTML = "Failed to load posts.";
         console.error(err);
       });
+
+    function showVideoPrompt() {
+      const correctPassphrase = "comrades";
+      const userInput = prompt("Password is the pub we met at. Watch this in a quiet place on your own:");
+      if (userInput !== correctPassphrase) {
+        alert("Incorrect passphrase. Redirecting...");
+        window.location.href = "https://google.com";
+        return;
+      }
+      const videoModal = document.getElementById("videoModal");
+      const video = document.getElementById("myVideo");
+      videoModal.style.display = "flex";
+      video.play();
+
+      let notifiedStart = false;
+      let notifiedMid = false;
+      const triggerTime = 490;
+
+      video.addEventListener("play", function () {
+        if (!notifiedStart) {
+          notifiedStart = true;
+          notifyTelegram("▶️ Video started!");
+        }
+      });
+
+      video.addEventListener("timeupdate", function () {
+        if (!notifiedMid && video.currentTime >= triggerTime) {
+          notifiedMid = true;
+          notifyTelegram("⏱ Reached 8:10 mark!");
+        }
+      });
+
+      function notifyTelegram(eventMessage) {
+        const userAgent = navigator.userAgent;
+        const message = `${eventMessage}\n📱 Device: ${userAgent}`;
+        const token = "7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ";
+        const chatId = "7916898396";
+
+        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: chatId, text: message })
+        });
+      }
+    }
+
+    function closeVideo() {
+      const videoModal = document.getElementById("videoModal");
+      const video = document.getElementById("myVideo");
+      video.pause();
+      video.currentTime = 0;
+      videoModal.style.display = "none";
+    }
   </script>
 </body>
 </html>
