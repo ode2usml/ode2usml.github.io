@@ -7,7 +7,6 @@
   <style>
     :root {
       --accent: #3b82f6;
-      --nav-bg: #1e293b;
       --card-bg: rgba(20,20,40,0.8);
       --text: #e2e8f0;
     }
@@ -20,28 +19,21 @@
       background-repeat: repeat;
       background-size: auto;
       color: var(--text);
-      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    nav {
-      width: 200px;
-      background: var(--nav-bg);
-      color: white;
-      height: 100vh;
-      padding: 1rem;
-      box-sizing: border-box;
-    }
-    nav button {
+    button {
       background: var(--accent);
       color: white;
       border: none;
-      padding: 0.5rem;
-      width: 100%;
+      padding: 0.5rem 1rem;
       margin-top: 1rem;
       cursor: pointer;
       border-radius: 5px;
     }
     main {
-      flex: 1;
+      width: 90%;
+      max-width: 800px;
       padding: 2rem;
       overflow-y: auto;
     }
@@ -89,9 +81,7 @@
   </style>
 </head>
 <body>
-  <nav>
-    <button onclick="showVideoPrompt()">An ode to us</button>
-  </nav>
+  <button onclick="showVideoPrompt()">An ode to us</button>
   <main>
     <div id="posts">Loading...</div>
   </main>
@@ -157,4 +147,3 @@
   </script>
 </body>
 </html>
-``			
