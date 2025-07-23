@@ -2,27 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>/title>
+  <title></title>
   <style>
+    :root {
+      --bg: #0f172a;
+      --text: #e2e8f0;
+      --accent: #3b82f6;
+      --nav-bg: #1e293b;
+      --card-bg: #1e1e2f;
+    }
+
     body {
       margin: 0;
       font-family: sans-serif;
       display: none;
+      background: var(--bg);
+      color: var(--text);
     }
+
     nav {
       width: 200px;
-      background: #1e293b;
+      background: var(--nav-bg);
       color: white;
       height: 100vh;
       padding: 1rem;
       box-sizing: border-box;
     }
+
     nav h2 {
       margin-top: 0;
       font-size: 1.2rem;
     }
+
     nav button {
-      background: #3b82f6;
+      background: var(--accent);
       color: white;
       border: none;
       padding: 0.5rem;
@@ -31,28 +44,32 @@
       cursor: pointer;
       border-radius: 5px;
     }
+
     main {
       flex: 1;
       padding: 2rem;
-      background: #f8fafc;
       overflow-y: auto;
     }
+
     .post {
-      background: white;
+      background: var(--card-bg);
       margin-bottom: 2rem;
       padding: 1rem;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
+
     .post h2 {
       margin-bottom: 0.3em;
-      color: #0f172a;
+      color: var(--text);
     }
+
     .timestamp {
       font-size: 0.8em;
-      color: #64748b;
+      color: #94a3b8;
       margin-bottom: 0.8em;
     }
+
     #videoModal {
       display: none;
       position: fixed;
@@ -64,10 +81,12 @@
       align-items: center;
       z-index: 9999;
     }
+
     #videoModal video {
       max-width: 90%;
       max-height: 80vh;
     }
+
     #videoModal button {
       position: absolute;
       top: 1rem;
@@ -83,10 +102,9 @@
 <body>
   <nav>
     <h2>Menu</h2>
-    <button onclick="showVideoPrompt()">Watch Video</button>
+    <button onclick="showVideoPrompt()">An ode to us</button>
   </nav>
   <main>
-    <h1></h1>
     <div id="posts">Loading...</div>
   </main>
 
@@ -123,7 +141,7 @@
           post.innerHTML = `
             <h2>${issue.title}</h2>
             <div class="timestamp">${new Date(issue.created_at).toLocaleString()}</div>
-            <p>${issue.body.replace(/\n/g, '<br>')}</p>
+            <p>${issue.body.replace(/\\n/g, '<br>')}</p>
           `;
           container.appendChild(post);
         });
@@ -166,7 +184,7 @@
 
       function notifyTelegram(eventMessage) {
         const userAgent = navigator.userAgent;
-        const message = `${eventMessage}\n📱 Device: ${userAgent}`;
+        const message = `${eventMessage}\\n📱 Device: ${userAgent}`;
         const token = "7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ";
         const chatId = "7916898396";
 
