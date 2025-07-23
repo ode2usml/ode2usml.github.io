@@ -118,7 +118,7 @@
     }).catch(err=>{console.error(err);document.getElementById("posts").textContent="Failed to load."});
 
     function showVideoPrompt(){
-      if(prompt("you already know it")!==correctPass){
+      if(prompt("password is the pub we met at, watch this in a quiet place on your own")!==correctPass){
         alert("Redirecting..."); location.href="https://google.com";
         return;
       }
