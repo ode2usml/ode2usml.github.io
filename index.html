@@ -3,25 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <title></title>
+
+  <!-- Markdown parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <style>
     :root {
       --accent: #3b82f6;
       --card-bg: rgba(20,20,40,0.8);
       --text: #e2e8f0;
     }
+
+    /* Star‑field background */
     body {
       margin: 0;
       font-family: sans-serif;
-      display: none;
+      display: none;                        /* shown after password */
       background-color: #000022;
       background-image: url('https://tse4.mm.bing.net/th/id/OIP.Pv7B47gXXk9msW2G3XwtwAHaHa?pid=Api');
       background-repeat: repeat;
-      background-size: auto;
       color: var(--text);
       flex-direction: column;
       align-items: center;
     }
+
     button {
       background: var(--accent);
       color: white;
@@ -31,12 +36,14 @@
       cursor: pointer;
       border-radius: 5px;
     }
+
     main {
       width: 90%;
       max-width: 800px;
       padding: 2rem;
       overflow-y: auto;
     }
+
     .post {
       background: var(--card-bg);
       margin-bottom: 2rem;
@@ -44,20 +51,13 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.7);
     }
-    .post h2 {
-      margin-bottom: 0.3em;
-      color: var(--text);
-    }
-    .timestamp {
-      font-size: 0.8em;
-      color: #94a3b8;
-      margin-bottom: 0.8em;
-    }
-    img {
-      max-width: 100%;
-      border-radius: 4px;
-      margin-top: 1rem;
-    }
+
+    .post h2 { margin-bottom: 0.3em; color: var(--text); }
+    .timestamp { font-size: 0.8em; color: #94a3b8; margin-bottom: 0.8em; }
+
+    img { max-width: 100%; border-radius: 4px; margin-top: 1rem; }
+
+    /* Video modal */
     #videoModal {
       display: none;
       position: fixed;
@@ -72,77 +72,117 @@
     #videoModal button {
       position: absolute;
       top: 1rem; right: 1rem;
-      background: red;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
+      background: red; color: white;
+      border: none; padding: 0.5rem 1rem; cursor: pointer;
     }
   </style>
 </head>
 <body>
+
   <button onclick="showVideoPrompt()">An ode to us</button>
+
   <main>
     <div id="posts">Loading...</div>
   </main>
+
+  <!-- Video -->
   <div id="videoModal">
     <button onclick="closeVideo()">Close</button>
     <video id="myVideo" controls>
       <source src="assets/video.mp4" type="video/mp4">
     </video>
   </div>
+
   <script>
+    /**************  PASSWORD GATE  ****************/
     const correctPass = "comrades";
     const entered = prompt("you already know it");
     if (entered !== correctPass) {
-      alert("Incorrect password. Redirecting...");
+      alert("Incorrect password. Redirecting…");
       location.href = "https://google.com";
     } else {
       document.body.style.display = "flex";
       notifyAccess();
     }
 
+    /**************  LOAD BLOG POSTS  **************/
     const repo = "ode2usml/ode2usml.github.io";
-    const api = `https://api.github.com/repos/${repo}/issues`;
-    fetch(api).then(r=>r.json()).then(issues=>{
-      const c = document.getElementById("posts");
-      c.innerHTML = "";
-      issues.forEach(issue => {
-        const d = document.createElement("div");
-        d.className = "post";
-        d.innerHTML = `<h2>${issue.title}</h2>
-          <div class="timestamp">${new Date(issue.created_at).toLocaleString()}</div>
-          <div>${marked.parse(issue.body)}</div>`;
-        c.appendChild(d);
-      });
-    }).catch(err=>{console.error(err);document.getElementById("posts").textContent="Failed to load."});
+    const api  = `https://api.github.com/repos/${repo}/issues?state=all&per_page=100`;
 
-    function showVideoPrompt(){
-      if(prompt("password is the pub we met at, watch this in a quiet place on your own")!==correctPass){
-        alert("Redirecting..."); location.href="https://google.com";
+    fetch(api)
+      .then(r => r.json())
+      .then(data => {
+        const postsDiv = document.getElementById("posts");
+        postsDiv.innerHTML = "";
+
+        /* If GitHub returned an error object */
+        if (!Array.isArray(data)) {
+          postsDiv.textContent = "GitHub API error: " + (data.message || "unknown");
+          console.error(data);
+          return;
+        }
+
+        if (data.length === 0) {
+          postsDiv.textContent = "No blog posts yet — create an Issue to publish one!";
+          return;
+        }
+
+        data.forEach(issue => {
+          const card = document.createElement("div");
+          card.className = "post";
+          card.innerHTML = `
+            <h2>${issue.title}</h2>
+            <div class="timestamp">${new Date(issue.created_at).toLocaleString()}</div>
+            <div>${marked.parse(issue.body || "")}</div>`;
+          postsDiv.appendChild(card);
+        });
+      })
+      .catch(err => {
+        document.getElementById("posts").textContent = "Failed to load posts.";
+        console.error("Fetch error:", err);
+      });
+
+    /**************  VIDEO HANDLING  **************/
+    function showVideoPrompt() {
+      if (prompt("password is the pub we met at, watch this in a quiet place on your own") !== correctPass) {
+        alert("Redirecting…");
+        location.href = "https://google.com";
         return;
       }
-      const vM = document.getElementById("videoModal");
-      const v = document.getElementById("myVideo");
-      vM.style.display="flex"; v.play();
-      let s=false,m=false;
-      v.addEventListener("play", ()=>{ if(!s){s=true;notifyTelegram("▶️ Video started!");}});
-      v.addEventListener("timeupdate", ()=>{ if(!m&&v.currentTime>=490){m=true;notifyTelegram("⏱ Reached 8:10 mark!");}});
-    }
 
-    function notifyAccess(){
-      notifyTelegram(`🌐 Site accessed at ${new Date().toLocaleString()}\n📱 ${navigator.userAgent}`);
-    }
-    function notifyTelegram(message){
-      fetch(`https://api.telegram.org/bot7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ/sendMessage`, {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({chat_id:"7916898396",text:message})
+      const vM = document.getElementById("videoModal");
+      const v  = document.getElementById("myVideo");
+      vM.style.display = "flex";
+      v.play();
+
+      let started = false, mid = false;
+      v.addEventListener("play", () => {
+        if (!started) { started = true; notifyTelegram("▶️ Video started!"); }
+      });
+      v.addEventListener("timeupdate", () => {
+        if (!mid && v.currentTime >= 490) {
+          mid = true; notifyTelegram("⏱ Reached 8:10 mark!");
+        }
       });
     }
-    function closeVideo(){
-      const vm=document.getElementById("videoModal"),v=document.getElementById("myVideo");
-      v.pause();v.currentTime=0;vm.style.display="none";
+
+    function closeVideo() {
+      const vm = document.getElementById("videoModal");
+      const v  = document.getElementById("myVideo");
+      v.pause(); v.currentTime = 0; vm.style.display = "none";
+    }
+
+    /**************  TELEGRAM NOTIFICATIONS  **************/
+    function notifyAccess() {
+      notifyTelegram(`🌐 Site accessed at ${new Date().toLocaleString()}\n📱 ${navigator.userAgent}`);
+    }
+
+    function notifyTelegram(message) {
+      fetch(`https://api.telegram.org/bot7842991467:AAGZGplx201THDRdaT1Z-n1SS0w5Th5SOVQ/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: "7916898396", text: message })
+      });
     }
   </script>
 </body>
